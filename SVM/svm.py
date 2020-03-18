@@ -6,31 +6,32 @@ import os
 path = os.path.join(os.path.dirname(__file__), '../tools/')
 sys.path.insert(1,path)
 from email_preprocess import preprocess
-from file_op import dos2unix
 from sklearn import metrics
 import time
 
 #%%
-# linear kernel
+# split data
 features_train, features_test, labels_train, labels_test = preprocess()
+# one persent of the train data
+features_train_1 = features_train[:int(len(features_train)/100)]
+labels_train_1 = labels_train[:int(len(labels_train)/100)]
+#%%
+# linear kernel
 clf = svm.SVC(kernel='linear')
+start_time = time.time()
 pred = clf.fit(features_train, labels_train).predict(features_test)
 print("Accuracy:",metrics.accuracy_score(labels_test, pred))
 print(round(time.time()-start_time,2)," seconds")
 
 # %%
-# %%
 # find the best C for rbf kernel
 c_values = [10,100,500,1000,5000,6000,7000,8000,9000,10000,20000,50000,100000]
 results = []
 # test with 1% of the data for performance puposes
-features_train, features_test, labels_train, labels_test = preprocess()
-features_train = features_train[:int(len(features_train)/100)]
-labels_train = labels_train[:int(len(labels_train)/100)]
 for c in c_values:
     start_time = time.time()
     clf = svm.SVC(kernel='rbf',C=c)
-    pred = clf.fit(features_train, labels_train).predict(features_test)
+    pred = clf.fit(features_train_1, labels_train_1).predict(features_test)
     duration = time.time()-start_time
     acc = metrics.accuracy_score(labels_test, pred)
     print("C:",c)
@@ -43,7 +44,6 @@ best_c = best_c['C']
 
 # %%
 # rbf kernel with the best C
-features_train, features_test, labels_train, labels_test = preprocess()
 clf = svm.SVC(kernel='rbf', C = best_c)
 pred = clf.fit(features_train, labels_train).predict(features_test)
 print("Accuracy:",metrics.accuracy_score(labels_test, pred))
