@@ -10,8 +10,8 @@ from sklearn.feature_selection import SelectPercentile, f_classif
 
 
 def preprocess():
-    words_file = "F:/Google Drive/git/ML/naive_bayes/word_data_fixed.pkl"
-    authors_file="F:/Google Drive/git/ML/naive_bayes/email_authors_fixed.pkl"
+    words_file = "../tools/word_data_fixed.pkl"
+    authors_file="../tools/email_authors_fixed.pkl"
     """ 
         this function takes a pre-made list of email texts (by default word_data.pkl)
         and the corresponding authors (by default email_authors.pkl) and performs
