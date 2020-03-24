@@ -4,3 +4,5 @@ This repository includes examples of machine learning algorithm that I've learne
 ### 1. Naive Bayes
 
 ### 2. Support Vector Machine (SVM)
+
+### 3. Decision Tree
