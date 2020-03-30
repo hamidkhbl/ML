@@ -1,5 +1,6 @@
 
 #%%
+import sklearn
 from sklearn import svm
 import sys
 import os
@@ -7,6 +8,8 @@ path = os.path.join(os.path.dirname(__file__), '../tools/')
 sys.path.insert(1,path)
 from email_preprocess import preprocess
 from sklearn import metrics
+from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import classification_report
 import time
 
 #%%
@@ -72,14 +75,45 @@ print(round(time.time()-start_time,2)," seconds")
 
 # %%
 # Parameter estimation using grid search with cross-validation
-from sklearn.model_selection import GridSearchCV
-parameters = {'kernel':('linear', 'rbf','sigmoid','poly'),
-                'C':[0.001,0.01,0.1,1,10,100,500,1000,5000],
-                 'gamma':[0.001,0.01,0.1,10,20,100,500]}
+
+tuned_parameters = [{'kernel': ['rbf'], 'gamma': [1e-3, 1e-4,1,10],
+                     'C': [0.1,1, 10, 100, 1000, 6000]},
+                    {'kernel': ['linear', 'sigmoid','poly'], 'C': [1, 10, 100, 1000,6000]}]
+
+scores = ['precision', 'recall','f1']
+
+for score in scores:
+    print("# Tuning hyper-parameters for %s" % score)
+    print()
+
+    clf = GridSearchCV(
+        svm.SVC(), tuned_parameters, scoring='%s_macro' % score
+    )
+    clf.fit(features_train_1, labels_train_1)
+
+    print("Best parameters set found on development set:")
+    print()
+    print(clf.best_params_)
+    print()
+
+    print("Detailed classification report:")
+    print()
+    print("The model is trained on the full development set.")
+    print("The scores are computed on the full evaluation set.")
+    print()
+    y_true, y_pred = labels_test, clf.predict(features_test)
+    print(classification_report(y_true, y_pred))
+    print()
+
+#%%
+# Grid search 
 svr = svm.SVC()
-clf = GridSearchCV(svr, parameters)
+clf = GridSearchCV(svr, tuned_parameters)
 pred = clf.fit(features_train_1, labels_train_1).predict(features_test)
 print("Accuracy:",metrics.accuracy_score(labels_test, pred))
 
+
+# %%
+sklearn.metrics.SCORERS.keys()
 
 # %%
