@@ -24,27 +24,42 @@ print("Accuracy:",metrics.accuracy_score(labels_test, pred))
 print(round(time.time()-start_time,2)," seconds")
 
 # %%
-# find the best C for rbf kernel
-c_values = [10,100,500,1000,5000,6000,7000,8000,9000,10000,20000,50000,100000]
+# Exhaustive Grid Search
+c_values = [0.001,0.01,0.1,1,10,100,500,1000,5000]
+gamma_values = [0.001,0.01,0.1,10,20,100,500]
+kernels = ['linear', 'rbf', 'sigmoid','poly']
 results = []
 # test with 1% of the data for performance puposes
 for c in c_values:
-    start_time = time.time()
-    clf = svm.SVC(kernel='rbf',C=c)
-    pred = clf.fit(features_train_1, labels_train_1).predict(features_test)
-    duration = time.time()-start_time
-    acc = metrics.accuracy_score(labels_test, pred)
-    print("C:",c)
-    print("Accuracy:",acc)
-    print(round(time.time()-start_time,2)," seconds \n")
-    results.append({'C':c,'Accuracy':acc})
+    for g in gamma_values:
+        for k in kernels:
+            start_time = time.time()
+            clf = svm.SVC(kernel=k,C=c, gamma=g)
+            pred = clf.fit(features_train_1, labels_train_1).predict(features_test)
+            duration = time.time()-start_time
+            acc = metrics.accuracy_score(labels_test, pred)
+            print('kernel:',k,"C:",c, 'gamma:',g)
+            print("Accuracy:",acc)
+            print(round(time.time()-start_time,2)," seconds \n")
+            results.append({'kernel':k, 'C':c, 'gamma':g,'Accuracy':acc,'time':duration})
+
 #%%
-best_c = max(results, key=lambda x: x['Accuracy'])
-best_c = best_c['C']
+best = max(results, key=lambda x: x['Accuracy'])
+best_kernel = best['kernel']
+best_c = best['C']
+best_gamma = best['gamma']
+
+print(best_kernel, best_c, best_gamma, best['Accuracy'])
 
 # %%
 # rbf kernel with the best C
-clf = svm.SVC(kernel='rbf', C = best_c)
+clf = svm.SVC(kernel='rbf', C = best_c, gamma = best_gamma)
 pred = clf.fit(features_train, labels_train).predict(features_test)
 print("Accuracy:",metrics.accuracy_score(labels_test, pred))
 print(round(time.time()-start_time,2)," seconds")
+
+
+# %%
+
+
+# %%
