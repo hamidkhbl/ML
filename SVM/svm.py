@@ -94,9 +94,7 @@ for score in scores:
     print("Best parameters set found on development set:")
     print()
     print(clf.best_params_)
-    print()
 
-    print("Detailed classification report:")
     print()
     print("The model is trained on the full development set.")
     print("The scores are computed on the full evaluation set.")
@@ -106,7 +104,7 @@ for score in scores:
     print()
 
 #%%
-# Grid search 
+# Parameter estimation using grid search with cross-validation
 svr = svm.SVC()
 clf = GridSearchCV(svr, tuned_parameters)
 pred = clf.fit(features_train_1, labels_train_1).predict(features_test)
